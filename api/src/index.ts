@@ -4,7 +4,7 @@ import { app } from './app';
 
 const start = async () => {
     try {
-        await mongoose.connect("mongodb://localhost:27017/ux_resort", {
+        await mongoose.connect("mongodb://localhost:27017/ux_resort_v3", {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			useCreateIndex: true,

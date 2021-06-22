@@ -3,13 +3,34 @@ import {Accommodation} from '../models/accommodation';
 import { body } from 'express-validator';
 import { validateRequest } from '../middlewares/validate_request';
 import { NotFoundError } from '../errors/not_found_error';
+import * as _ from "lodash"
 
 const router = express.Router();
 
 router.get('/api/accommodations', async (req:Request , res:Response) => {
-    const accomodations = await Accommodation.find({});
+    const accomodations = await Accommodation.aggregate([
+        { 
+            $lookup: {
+                from: "rooms", 
+                localField: "_id", 
+                foreignField: "accommodation",
+                as: 'accommodationDoc'
+            },
+        },
+    ]).exec();
+    
+    accomodations.map((v: any) => (
+        v.accommodationDoc = _.groupBy(v.accommodationDoc,"type")
+    ));
 
     res.send(accomodations);
+});
+
+router.get('/api/accommodations/count', async (req:Request , res:Response) => {
+    const count = await Accommodation.countDocuments({});
+    const accomodations = await Accommodation.find({});
+    
+    res.send({count,accomodations});
 });
 
 router.post('/api/accommodations',
@@ -29,16 +50,22 @@ router.post('/api/accommodations',
     async (req:Request , res:Response) => {
         const {title,description} = req.body;
 
-        const accommodation = Accommodation.build({
-            title,
-            description,
-            coverImageUrl : 'image2',
-            images : 'image'
-        });
+        const isAccommodationExists = await Accommodation.findOne({title});
 
-        await accommodation.save();
-
-        res.status(201).send(accommodation);
+        if(!isAccommodationExists){
+            const accommodation = Accommodation.build({
+                title,
+                description,
+                coverImageUrl : 'image2',
+                images : 'image'
+            });
+    
+            await accommodation.save();
+    
+            res.status(201).send(accommodation);
+        }else{
+            res.status(409).send(title+" Already Exists!");
+        }
     }
 );
 

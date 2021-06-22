@@ -1,5 +1,11 @@
 export enum RoomType {
     Single = 'Single',
     Double = 'Double',
-    Familly = 'Family'
+    Familly = 'Familly'
+}
+
+export enum RoomRate {
+    Single = '50',
+    Double = '100',
+    Familly = '180'
 }

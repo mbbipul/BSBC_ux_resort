@@ -1,16 +1,18 @@
 import mongoose from "mongoose";
-import { RoomType } from "./room_type";
+import { RoomRate, RoomType } from "./room_type";
 import {AccommoDoc} from './accommodation';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface RoomAttrs {
-    accommodation : AccommoDoc,
+    accommodation : string,
     type: RoomType,
+    roomRate: number,
 }
 
 interface RoomDoc extends mongoose.Document {
-    accommodation: AccommoDoc,
+    accommodation: string,
     type: RoomType,
+    roomRate: number,
 }
 
 interface RoomModel extends mongoose.Model<RoomDoc> {
@@ -20,14 +22,20 @@ interface RoomModel extends mongoose.Model<RoomDoc> {
 const roomSchema = new mongoose.Schema({
     accommodation: { 
         type: mongoose.Types.ObjectId,
-        ref: 'Accommodation' 
+        ref: 'Accommodation' ,
+        required: true,
     },
     type : {
         type: String,
         required: true,
         enum: Object.values(RoomType),
-        default: RoomType.Double
+    },
+    roomRate : {
+        type: Number,
+        required: true,
+        enum: Object.values(RoomRate),
     }
+    
 });
 
 roomSchema.plugin(updateIfCurrentPlugin);
@@ -37,6 +45,6 @@ roomSchema.statics.build = (attrs: RoomAttrs) => {
 };
 
 
-const Room = mongoose.model<RoomDoc, RoomModel>('Rooms', roomSchema);
+const Room = mongoose.model<RoomDoc, RoomModel>('Room', roomSchema);
 
-export { RoomDoc,Room };
+export { RoomDoc,roomSchema,Room };

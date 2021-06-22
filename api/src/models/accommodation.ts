@@ -13,7 +13,7 @@ interface AccommoDoc extends mongoose.Document {
     title :  string,
     coverImageUrl: string,
     description: string,
-    images: [String],
+    images: [string],
     rooms: [RoomDoc]
 }
 
@@ -36,11 +36,7 @@ const accommoSchema = new mongoose.Schema({
     },
     images: {
         type: [String],
-    },
-    rooms: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'Rooms'
-    }]
+    }
 });
 
 accommoSchema.plugin(updateIfCurrentPlugin);
@@ -49,6 +45,6 @@ accommoSchema.statics.build = (attrs: AccommoAttrs) => {
   return new Accommodation(attrs);
 };
 
-const Accommodation = mongoose.model<AccommoDoc, AccommoModel>('Accommodations', accommoSchema);
+const Accommodation = mongoose.model<AccommoDoc, AccommoModel>('Accommodation', accommoSchema);
 
 export { AccommoDoc,Accommodation };
