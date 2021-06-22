@@ -4,17 +4,18 @@ import { RoomDoc } from './rooms';
 
 interface AccommoAttrs {
     title :  string,
-    coverImageUrl: string,
     description: string,
-    images: string,
+    singleRoom : number,
+    doubleRoom : number,
+    famillyRoom : number
 }
 
 interface AccommoDoc extends mongoose.Document {
     title :  string,
-    coverImageUrl: string,
     description: string,
-    images: [string],
-    rooms: [RoomDoc]
+    singleRoom : number,
+    doubleRoom : number,
+    famillyRoom : number
 }
 
 interface AccommoModel extends mongoose.Model<AccommoDoc> {
@@ -26,16 +27,21 @@ const accommoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    coverImageUrl: {
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
     },
-    images: {
-        type: [String],
+    singleRoom : {
+        type: Number,
+        required: true
+    },
+    doubleRoom : {
+        type: Number,
+        required: true
+    },
+    famillyRoom : {
+        type: Number,
+        required: true
     }
 });
 
@@ -47,4 +53,4 @@ accommoSchema.statics.build = (attrs: AccommoAttrs) => {
 
 const Accommodation = mongoose.model<AccommoDoc, AccommoModel>('Accommodation', accommoSchema);
 
-export { AccommoDoc,Accommodation };
+export { AccommoDoc,Accommodation,AccommoAttrs };

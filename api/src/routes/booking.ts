@@ -1,9 +1,12 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { Booking, BookingStatus } from '../models/booking';
+import { Accommodation, AccommoDoc, } from '../models/accommodation';
+
 import mongoose from 'mongoose';
 import { validateRequest } from '../middlewares/validate_request';
 import { checkDateInRange, getDateShortString } from '../utils/linq';
+import { Room, RoomDoc } from '../models/rooms';
 
 const router = express.Router();
 
@@ -24,11 +27,13 @@ router.get('/api/booking', async (req:Request , res:Response) => {
 router.get('/api/booking/room-available/:checkInTime-:checkOutTime', async (req:Request , res:Response) => {
     const {checkInTime,checkOutTime} = req.params;
     // const booking = Booking.find({checkInTime :  { "$gte" : ISO checkInTime }});
-    const bookingRoom = await Booking.find({});
+    const bookingRoom = await Booking.find().populate('rooms').exec();
     let data = bookingRoom.filter(
-        d => !checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkInTime)) && !checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkOutTime)));
+        d => checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkInTime)) && checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkOutTime)));
     // console.log(bookingRoom)
-    res.send(data);
+    const accomodations = await Accommodation.find();
+
+    res.send(accomodations);
 });
 
 router.post('/api/booking',
@@ -49,11 +54,6 @@ router.post('/api/booking',
             .withMessage('Email is required')
             .isEmail()
             .withMessage('Email is not valid'),
-        body('country')
-            .not()
-            .isEmpty()
-            .isString()
-            .withMessage('Country name is required'),
         body('address')
             .not()
             .isEmpty()
@@ -69,18 +69,12 @@ router.post('/api/booking',
             .isEmpty()
             .isString()
             .withMessage('Checkout Time is required'),
-        body('adults')
-            .not()
-            .isEmpty()
-            .custom((input : number) => input > 0 ) 
-            .withMessage('Number of adults at least 1 person requied'),
+        
         body('rooms')
             .isArray()
             .withMessage("Rooms must be an array")
             .custom((input : [string]) => input.length > 0)
             .withMessage("At least one room is required")
-            .custom((input : [string]) => input.every(mongoose.Types.ObjectId)) 
-            .withMessage('Valid Room id is required'),
     ],
     validateRequest,
     async (req:Request , res:Response) => {
@@ -88,26 +82,32 @@ router.post('/api/booking',
             name,
             phone,
             email,
-            country,
             address,
             checkInTime,
             checkOutTime,
-            adults,
-            childs,
             rooms,
         } = req.body;
+
+        const roomsId : string[] = [];
+
+        rooms.map((v: RoomDoc) => {
+
+        });
+        
+        const roomsObj = await Room.insertMany(rooms);
+
+        const roomIds : string[] = [];
+
+        roomsObj.map((v: RoomDoc) => roomIds.push(v._id));
 
         const booking = Booking.build({
             name,
             phone,
             email,
-            country,
             address,
             checkInTime,
             checkOutTime,
-            adults,
-            childs,
-            rooms,
+            rooms : roomIds,
         });
 
         await booking.save();

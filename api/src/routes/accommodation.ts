@@ -8,20 +8,11 @@ import * as _ from "lodash"
 const router = express.Router();
 
 router.get('/api/accommodations', async (req:Request , res:Response) => {
-    const accomodations = await Accommodation.aggregate([
-        { 
-            $lookup: {
-                from: "rooms", 
-                localField: "_id", 
-                foreignField: "accommodation",
-                as: 'accommodationDoc'
-            },
-        },
-    ]).exec();
+    const accomodations = await Accommodation.find();
     
-    accomodations.map((v: any) => (
-        v.accommodationDoc = _.groupBy(v.accommodationDoc,"type")
-    ));
+    // accomodations.map((v: any) => (
+    //     v.accommodationDoc = _.groupBy(v.accommodationDoc,"type")
+    // ));
 
     res.send(accomodations);
 });
@@ -48,7 +39,14 @@ router.post('/api/accommodations',
     ],
     validateRequest,
     async (req:Request , res:Response) => {
-        const {title,description} = req.body;
+        
+        const {
+            title,
+            description,
+            singleRoom ,
+            doubleRoom ,
+            famillyRoom
+        } = req.body;
 
         const isAccommodationExists = await Accommodation.findOne({title});
 
@@ -56,8 +54,9 @@ router.post('/api/accommodations',
             const accommodation = Accommodation.build({
                 title,
                 description,
-                coverImageUrl : 'image2',
-                images : 'image'
+                singleRoom ,
+                doubleRoom ,
+                famillyRoom
             });
     
             await accommodation.save();

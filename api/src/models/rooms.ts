@@ -5,14 +5,16 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface RoomAttrs {
     accommodation : string,
-    type: RoomType,
-    roomRate: number,
+    singleRoom : number,
+    doubleRoom : number,
+    famillyRoom : number
 }
 
 interface RoomDoc extends mongoose.Document {
     accommodation: string,
-    type: RoomType,
-    roomRate: number,
+    singleRoom : number,
+    doubleRoom : number,
+    famillyRoom : number
 }
 
 interface RoomModel extends mongoose.Model<RoomDoc> {
@@ -25,16 +27,15 @@ const roomSchema = new mongoose.Schema({
         ref: 'Accommodation' ,
         required: true,
     },
-    type : {
-        type: String,
-        required: true,
-        enum: Object.values(RoomType),
+    singleRoom : {
+        type: Number
     },
-    roomRate : {
-        type: Number,
-        required: true,
-        enum: Object.values(RoomRate),
-    }
+    doubleRoom : {
+        type: Number
+    },
+    famillyRoom : {
+        type: Number
+    },
     
 });
 

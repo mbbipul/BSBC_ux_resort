@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { AccommoDoc } from './accommodation';
 import { RoomDoc } from './rooms';
 
 enum BookingStatus {
@@ -12,26 +13,20 @@ interface BookingAttrs {
     name : string ,
     phone: string,
     email: string,
-    country: string,
     address: string,
     checkInTime: string,
     checkOutTime: string,
-    adults: number,
-    childs: number,
-    rooms: [string],
+    rooms: string[],
 }
 
 interface BookingDoc extends mongoose.Document {
     name : string ,
     phone: string,
     email: string,
-    country: string,
     address: string,
     checkInTime: string,
     checkOutTime: string,
-    adults: number,
-    childs: number,
-    rooms: [string],
+    rooms: string[],
 }
 
 interface BookingModel extends mongoose.Model<BookingDoc> {
@@ -51,10 +46,6 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    country: {
-        type: String,
-        required: true,
-    },
     address: {
         type: String,
         required: true,
@@ -66,14 +57,6 @@ const bookingSchema = new mongoose.Schema({
     checkOutTime: {
         type: String,
         required: true,
-    },
-    adults: {
-        type: Number,
-        required: true
-    },
-    childs: {
-        type: Number,
-        default: 0
     },
     status: {
         type: String,
