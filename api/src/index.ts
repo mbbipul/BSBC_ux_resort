@@ -2,9 +2,11 @@ import mongoose from 'mongoose';
 
 import { app } from './app';
 
+const uri = "mongodb+srv://bipul:Ypdx@XXDY7Kcs87@cluster0.3aryl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+
 const start = async () => {
     try {
-        await mongoose.connect("mongodb://localhost:27017/ux_resort_v4", {
+        await mongoose.connect(uri, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			useCreateIndex: true,
