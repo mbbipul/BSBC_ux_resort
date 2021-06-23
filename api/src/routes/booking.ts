@@ -3,9 +3,8 @@ import { body } from 'express-validator';
 import { Booking, BookingStatus } from '../models/booking';
 import { Accommodation, AccommoDoc, } from '../models/accommodation';
 
-import mongoose from 'mongoose';
 import { validateRequest } from '../middlewares/validate_request';
-import { checkDateInRange, getDateShortString } from '../utils/linq';
+import { checkDateInRange, flattArr, getDateShortString } from '../utils/linq';
 import { Room, RoomDoc } from '../models/rooms';
 
 const router = express.Router();
@@ -32,10 +31,13 @@ router.get('/api/booking/room-available/:checkInTime-:checkOutTime', async (req:
         d => checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkInTime)) || checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkOutTime)));
     // console.log(bookingRoom)
     console.log(data);
-    const ids = data.map(({ _id }) => _id);
-    const accomodations = await Accommodation.find({'_id': {$in:ids}});
+    const rooms = data.map(({ rooms }) => rooms);
+    const roomIds = flattArr(rooms);
+    const accoommodationIds = roomIds.map(({accommodation}) => accommodation);
 
-    res.send(data);
+    const accomodations = await Accommodation.find({'_id': {$in:accoommodationIds}});
+
+    res.send(accomodations);
 });
 
 router.post('/api/booking',

@@ -33,5 +33,8 @@ const checkDateInRange = (from : string,to : string,check : string) : boolean =>
 
 const getDateShortString = (date : string) : string =>  new Date(parseInt(date)).toLocaleString().split(',')[0];
 
-export { groupBy,getDateShortString,checkDateInRange };
+const flattArr =  (arr : any[]) : [] => arr.reduce((acc : any, cur : []) => acc.concat(Array.isArray(cur) ? flattArr(cur) : cur), [])
+
+
+export { groupBy,getDateShortString,checkDateInRange,flattArr };
 
