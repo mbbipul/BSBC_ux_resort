@@ -29,11 +29,13 @@ router.get('/api/booking/room-available/:checkInTime-:checkOutTime', async (req:
     // const booking = Booking.find({checkInTime :  { "$gte" : ISO checkInTime }});
     const bookingRoom = await Booking.find().populate('rooms').exec();
     let data = bookingRoom.filter(
-        d => checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkInTime)) && checkDateInRange(getDateShortString(checkInTime),getDateShortString(checkOutTime),getDateShortString(d.checkOutTime)));
+        d => checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkInTime)) || checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkOutTime)));
     // console.log(bookingRoom)
-    const accomodations = await Accommodation.find();
+    console.log(data);
+    const ids = data.map(({ _id }) => _id);
+    const accomodations = await Accommodation.find({'_id': {$in:ids}});
 
-    res.send(accomodations);
+    res.send(data);
 });
 
 router.post('/api/booking',

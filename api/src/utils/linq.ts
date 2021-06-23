@@ -8,14 +8,25 @@ const groupBy = <T, K extends keyof any> (list: T[], getKey: (item: T) => K) =>
                     }, {} as Record<K, T[]>);
 
 const checkDateInRange = (from : string,to : string,check : string) : boolean => {
-    var fDate,lDate,cDate;
-    fDate = Date.parse(from);
-    lDate = Date.parse(to);
-    cDate = Date.parse(check);
-
-    if((cDate <= lDate && cDate >= fDate)) {
+    const D_1 = from.split("/");
+    const D_2 = to.split("/");
+    const D_3 = check.split("/");
+      
+    var d1 = new Date(parseInt(D_1[2]), parseInt(D_1[0])-1, parseInt(D_1[1])+1);
+    var d2 = new Date(parseInt(D_2[2]), parseInt(D_2[0])-1 , parseInt(D_2[1])+1);
+    var d3 = new Date(parseInt(D_3[2]), parseInt(D_3[0])-1 , parseInt(D_3[1])+1);
+    // console.log({
+    //     d1,d2,d3
+    // });
+    // console.log({
+    //     from,to ,check
+    // })
+    if (d3 >= d1 && d3 <= d2) {
+        // console.log(true);
         return true;
-    }
+    } 
+    // console.log(false);
+
     return false;
                    
 }      

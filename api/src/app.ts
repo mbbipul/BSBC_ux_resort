@@ -6,8 +6,10 @@ import {index,accomodationRouter} from './routes/index';
 import { NotFoundError } from './errors/not_found_error';
 import { errorHandler } from './middlewares/error_handler';
 import { bookingRouter } from './routes/booking';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
 app.set('trust proxy', true);
 app.use(json());
 

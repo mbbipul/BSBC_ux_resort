@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { app } from './app';
 
-const uri = "mongodb+srv://bipul:Ypdx@XXDY7Kcs87@cluster0.3aryl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = "mongodb+srv://bipul:Ypdx@XXDY7Kcs87@cluster0.3aryl.mongodb.net/kolpona_islands?retryWrites=true&w=majority";
 
 const start = async () => {
     try {
@@ -16,7 +16,7 @@ const start = async () => {
         console.error(error);
     }
 
-    app.listen(3000, () => {
+    app.listen(3002, () => {
 		console.log('Listening on port 3000!!!!!!!!');
 	});
 
