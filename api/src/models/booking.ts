@@ -26,6 +26,7 @@ interface BookingDoc extends mongoose.Document {
     address: string,
     checkInTime: string,
     checkOutTime: string,
+    status: BookingStatus,
     rooms: string[],
 }
 

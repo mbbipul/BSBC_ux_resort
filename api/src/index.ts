@@ -4,6 +4,8 @@ import { app } from './app';
 
 const uri = "mongodb+srv://bipul:Ypdx@XXDY7Kcs87@cluster0.3aryl.mongodb.net/kolpona_islands?retryWrites=true&w=majority";
 
+const port = 3000;
+
 const start = async () => {
     try {
         await mongoose.connect(uri, {
@@ -16,8 +18,8 @@ const start = async () => {
         console.error(error);
     }
 
-    app.listen(3002, () => {
-		console.log('Listening on port 3000!!!!!!!!');
+    app.listen(port, () => {
+		console.log('Listening on port '+port+'!!!!!!!!');
 	});
 
 }

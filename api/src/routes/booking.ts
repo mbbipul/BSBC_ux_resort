@@ -26,18 +26,35 @@ router.get('/api/booking', async (req:Request , res:Response) => {
 router.get('/api/booking/room-available/:checkInTime-:checkOutTime', async (req:Request , res:Response) => {
     const {checkInTime,checkOutTime} = req.params;
     // const booking = Booking.find({checkInTime :  { "$gte" : ISO checkInTime }});
-    const bookingRoom = await Booking.find().populate('rooms').exec();
+    const bookingRoom = await Booking.find({"status": {$ne: BookingStatus.Cancell}}).populate('rooms').exec();
     let data = bookingRoom.filter(
         d => checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkInTime)) || checkDateInRange(getDateShortString(d.checkInTime),getDateShortString(d.checkOutTime),getDateShortString(checkOutTime)));
     // console.log(bookingRoom)
-    console.log(data);
     const rooms = data.map(({ rooms }) => rooms);
     const roomIds = flattArr(rooms);
-    const accoommodationIds = roomIds.map(({accommodation}) => accommodation);
 
-    const accomodations = await Accommodation.find({'_id': {$in:accoommodationIds}});
+    const real_accoms = await Accommodation.find().populate('rooms').exec();
+    
+    real_accoms.map((acc_real) => {
+        const res = roomIds.filter(({accommodation }) => String(accommodation) === String(acc_real._id));
+        console.log({
+            res,
+            id : acc_real._id
+        })
 
-    res.send(accomodations);
+        const tmp = {
+            singleRoom : res.reduce((acc,cur : any) => acc+cur.singleRoom,0),
+            doubleRoom : res.reduce((acc,cur : any) => acc+cur.doubleRoom,0),
+            famillyRoom : res.reduce((acc,cur : any) => acc+cur.famillyRoom,0)
+        };
+
+        acc_real.singleRoom = acc_real.singleRoom - tmp.singleRoom;
+        acc_real.doubleRoom = acc_real.doubleRoom - tmp.doubleRoom;
+        acc_real.famillyRoom = acc_real.famillyRoom - tmp.famillyRoom;
+
+    });
+
+    res.send(real_accoms);
 });
 
 router.post('/api/booking',
@@ -120,5 +137,30 @@ router.post('/api/booking',
     }
 );
 
+router.post('/api/booking/cancell',
+    [
+        body('secretCode')
+            .not()
+            .isEmpty() 
+            .isString()
+            .withMessage('secretCode is required'),
+    ],
+    validateRequest,
+    async (req:Request , res:Response) => {
+        const {
+            secretCode
+        } = req.body;
+
+        const booking = await Booking.findOne({_id : secretCode});
+        
+        if(booking){
+            booking.status = BookingStatus.Cancell;
+            await booking.save();
+        }else {
+            res.status(409).send({ message : "Booking not found"});
+        }
+        res.status(200).send(booking);
+    }
+);
 
 export { router as bookingRouter};
