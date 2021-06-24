@@ -6,6 +6,7 @@ import { Accommodation, AccommoDoc, } from '../models/accommodation';
 import { validateRequest } from '../middlewares/validate_request';
 import { checkDateInRange, flattArr, getDateShortString } from '../utils/linq';
 import { Room, RoomDoc } from '../models/rooms';
+import { NotFoundError } from '../errors/not_found_error';
 
 const router = express.Router();
 
@@ -22,6 +23,16 @@ router.get('/api/booking', async (req:Request , res:Response) => {
     ]).exec();
     res.send(booking);
 });
+
+router.get('/api/booking/:id', async (req:Request , res:Response) => {
+    const booking = await Booking.findById(req.params.id);
+
+    if(!booking){
+        throw new NotFoundError();
+    }
+    res.send(booking);
+});
+
 
 router.get('/api/booking/room-available/:checkInTime-:checkOutTime', async (req:Request , res:Response) => {
     const {checkInTime,checkOutTime} = req.params;
