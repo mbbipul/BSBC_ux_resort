@@ -25,7 +25,7 @@ router.get('/api/booking', async (req:Request , res:Response) => {
 });
 
 router.get('/api/booking/:id', async (req:Request , res:Response) => {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id).populate('rooms');
 
     if(!booking){
         throw new NotFoundError();
@@ -119,12 +119,6 @@ router.post('/api/booking',
             checkOutTime,
             rooms,
         } = req.body;
-
-        const roomsId : string[] = [];
-
-        rooms.map((v: RoomDoc) => {
-
-        });
         
         const roomsObj = await Room.insertMany(rooms);
 
@@ -144,11 +138,16 @@ router.post('/api/booking',
 
         await booking.save();
 
-        res.status(201).send(booking);
+        const afterBooking = await Booking.findById(booking._id).populate('rooms');
+
+        if(!afterBooking){
+            throw new Error();
+        }
+        res.status(201).send(afterBooking);
     }
 );
 
-router.post('/api/booking/cancell',
+router.put('/api/booking/cancell',
     [
         body('secretCode')
             .not()
@@ -162,7 +161,7 @@ router.post('/api/booking/cancell',
             secretCode
         } = req.body;
 
-        const booking = await Booking.findOne({_id : secretCode});
+        const booking = await Booking.findOne({_id : secretCode}).populate('rooms');
         
         if(booking){
             booking.status = BookingStatus.Cancell;
@@ -174,4 +173,29 @@ router.post('/api/booking/cancell',
     }
 );
 
+router.put('/api/booking/rejected',
+    [
+        body('secretCode')
+            .not()
+            .isEmpty() 
+            .isString()
+            .withMessage('secretCode is required'),
+    ],
+    validateRequest,
+    async (req:Request , res:Response) => {
+        const {
+            secretCode
+        } = req.body;
+
+        const booking = await Booking.findOne({_id : secretCode}).populate('rooms');
+        
+        if(booking){
+            booking.status = BookingStatus.Rejected;
+            await booking.save();
+        }else {
+            res.status(409).send({ message : "Booking not found"});
+        }
+        res.status(200).send(booking);
+    }
+);
 export { router as bookingRouter};

@@ -6,7 +6,8 @@ import { RoomDoc } from './rooms';
 enum BookingStatus {
     Pending = 'Pending',
     Booked = 'Booked',
-    Cancell = 'Cancell'
+    Cancell = 'Cancell',
+    Rejected = "Rejected"
 }
 
 interface BookingAttrs {
