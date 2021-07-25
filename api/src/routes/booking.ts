@@ -173,6 +173,32 @@ router.put('/api/booking/cancell',
     }
 );
 
+router.put('/api/booking/accepted',
+    [
+        body('secretCode')
+            .not()
+            .isEmpty() 
+            .isString()
+            .withMessage('secretCode is required'),
+    ],
+    validateRequest,
+    async (req:Request , res:Response) => {
+        const {
+            secretCode
+        } = req.body;
+
+        const booking = await Booking.findOne({_id : secretCode}).populate('rooms');
+        
+        if(booking){
+            booking.status = BookingStatus.Booked;
+            await booking.save();
+        }else {
+            res.status(409).send({ message : "Booking not found"});
+        }
+        res.status(200).send(booking);
+    }
+);
+
 router.put('/api/booking/rejected',
     [
         body('secretCode')
